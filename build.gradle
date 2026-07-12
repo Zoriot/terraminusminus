@@ -13,7 +13,7 @@ allprojects {
     var git_commit = 'git rev-parse --short HEAD'.execute().text.trim().replace('/', '-')
     var git_version = git_tag ?: git_branch ?: git_commit
 
-    var version_suffix = System.getenv("TMM_RELEASE") == 'true' ? "": System.getenv("TMM_VERSION_SUFFIX") ?: "-SNAPSHOT"
+    var version_suffix = ""
 
     version = git_version + version_suffix
     group = "net.buildtheearth.terraminusminus"
@@ -63,6 +63,19 @@ allprojects {
                 credentials {
                     username System.getenv("MAVEN_NAME")
                     password System.getenv("MAVEN_SECRET")
+                }
+            }
+            maven {
+                name = "BTEReleases"
+                url = uri("https://maven.buildtheearth.net/releases")
+                credentials {
+                    username = providers.gradleProperty("bteUser")
+                            .orElse(providers.environmentVariable("MAVEN_NAME"))
+                            .getOrNull()
+
+                    password = providers.gradleProperty("btePassword")
+                            .orElse(providers.environmentVariable("MAVEN_SECRET"))
+                            .getOrNull()
                 }
             }
         }
